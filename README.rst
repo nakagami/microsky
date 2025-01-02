@@ -21,6 +21,8 @@ Here is an example of doing the following
 
 ::
 
+   import microsky
+
    with microsky.createSession("xxx.bsky.social", "password") as session:
        print(session.listPosts(did=session.did))
        post = session.sendPost("Hello Bluesky!")
