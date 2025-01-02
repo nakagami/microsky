@@ -7,7 +7,7 @@ A Bluesky client for Python and MicoroPython.
 Usage
 -----------------
 
-Sorry see microsky.py and the Bluesky HTTP API reference https://docs.bsky.app/docs/category/http-reference for usage.
+See microsky.py and the Bluesky HTTP API reference https://docs.bsky.app/docs/category/http-reference for usage.
 
 
 Example
@@ -23,7 +23,7 @@ Here is an example of doing the following
 
    with microsky.createSession("xxx.bsky.social", "password") as session:
        print(session.listPosts(did=session.did))
-       post = session.sendPost("Hello Bluesky!
+       post = session.sendPost("Hello Bluesky!")
        print(post)
        print(session.listPosts(did=session.did))
        print("delete")
