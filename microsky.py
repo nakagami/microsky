@@ -100,13 +100,25 @@ class Session:
         self.deleteSession()
 
     def json(self):
+        """return creteSession request response.
+        """
         return self._data
 
-    def get(self, path, params=None, token="accessJwt"):
+    def get(self, path: str, params=None, token="accessJwt") -> dict:
+        """ HTTP get with parameters and JWT header
+        path: url without prefix
+        params: HTTP get parameters dict
+        token: JWT header key name
+        """
         headers = {"Authorization": f"Bearer {self._data[token]}"}
         return _requests_get(self.prefix + path, params, headers)
 
-    def post(self, path, data=None, token="accessJwt"):
+    def post(self, path:str, data=None, token="accessJwt") -> dict:
+        """ HTTP post with parameters and JWT header
+        path: url without prefix
+        params: HTTP post parameters dict or bytes
+        token: JWT header key name
+        """
         headers = {
             "Content-Type": "application/json; charset=UTF-8",
             "Authorization": f"Bearer {self._data[token]}",
@@ -115,52 +127,71 @@ class Session:
             data = json.dumps(data).encode('utf-8')
         return _requests_post(self.prefix + path, data, headers)
 
-    def current_time(self):
+    def current_time(self) -> str:
+        """get iso format current datetime"""
         t = time.gmtime()
         return f"{t[0]:04}-{t[1]:02}-{t[2]:02}T{t[3]:02}:{t[4]:02}:{t[5]:02}.000Z"
 
     # See Bluesky HTTP API reference
     # https://docs.bsky.app/docs/category/http-reference
 
-    def getPreferences(self):
+    def getPreferences(self) -> dict:
+        "Get private preferences attached to the current account."
         return self.get("app.bsky.actor.getPreferences")
 
-    def getProfile(self, actor):
+    def getProfile(self, actor:str) -> dict:
+        "Get detailed profile view of an actor."
         return self.get("app.bsky.actor.getProfile", {"actor": actor})
 
-    def getProfiles(self, **kwargs):
+    def getProfiles(self, **kwargs) -> dict:
+        "Get detailed profile views of multiple actors."
         assert "actors" in kwargs
         return self.get("app.bsky.actor.getProfiles", kwargs)
 
-    def getSuggestions(self):
+    def getSuggestions(self) -> dict:
+        "Get a list of suggested actors."
         return self.get("app.bsky.actor.getSuggestions")
 
-    def putPreferences(self, preferences):
+    def putPreferences(self, preferences: dict) -> dict:
+        """Set the private preferences attached to the account.
+
+        >>> session.putPreferences([{
+        ...     "$type": "app.bsky.actor.defs#personalDetailsPref",
+        ...     "birthDate":"1967-08-11T00:00:00.000Z",
+        ... }])
+        """
         return self.post("app.bsky.actor.putPreferences", {"preferences": preferences})
 
-    def getActorFeeds(self, **kwargs):
+    def getActorFeeds(self, **kwargs) -> dict:
+        "Get a list of feeds created by the actor."
         assert "actor" in kwargs
         return self.get("app.bsky.feed.getActorFeeds", kwargs)
 
-    def getActorLikes(self, **kwargs):
+    def getActorLikes(self, **kwargs) -> dict:
+        "Get a list of posts liked by an actor. "
         assert "actor" in kwargs
         return self.get("app.bsky.feed.getActorLikes", kwargs)
 
-    def getAuthorFeed(self, **kwargs):
+    def getAuthorFeed(self, **kwargs) -> dict:
+        "Get a view of an actor's 'author feed' (post and reposts by the author)."
         assert "actor" in kwargs
         return self.get("app.bsky.feed.getAuthorFeed", kwargs)
 
-    def getTimeline(self, **kwargs):
+    def getTimeline(self, **kwargs) -> dict:
+        "Get a view of the requesting account's home timeline."
         return self.get("app.bsky.feed.getTimeline", kwargs)
 
-    def getListBlocks(self, **kwargs):
+    def getListBlocks(self, **kwargs) -> dict:
+        "Get mod lists that the requesting account (actor) is blocking. "
         return self.get("app.bsky.graph.getListBlocks", kwargs)
 
-    def getFollowers(self, **kwargs):
+    def getFollowers(self, **kwargs) -> dict:
+        "Enumerates accounts which follow a specified account (actor)."
         assert "actor" in kwargs
         return self.get("app.bsky.graph.getFollowers", kwargs)
 
-    def sendPost(self, text):
+    def sendPost(self, text:str) -> dict:
+        "post"
         params = {
             "repo": self._data["did"],
             "collection": "app.bsky.feed.post",
@@ -172,7 +203,8 @@ class Session:
         }
         return self.post("com.atproto.repo.createRecord", params)
 
-    def likePost(self, uri, cid):
+    def likePost(self, uri: str, cid: str) -> dict:
+        "Like"
         params = {
             "repo": self._data["did"],
             "collection": "app.bsky.feed.like",
@@ -189,7 +221,8 @@ class Session:
         }
         return self.post("com.atproto.repo.createRecord", params)
 
-    def rePost(self, uri, cid):
+    def rePost(self, uri: str, cid: str) -> dict:
+        "Repost"
         params = {
             "repo": self._data["did"],
             "collection": "app.bsky.feed.repost",
@@ -206,7 +239,8 @@ class Session:
         }
         return self.post("com.atproto.repo.createRecord", params)
 
-    def deletePost(self, uri):
+    def deletePost(self, uri:str) -> dict:
+        "Delete post"
         params = {
             "repo": self._data["did"],
             "collection": "app.bsky.feed.post",
@@ -214,7 +248,8 @@ class Session:
         }
         return self.post("com.atproto.repo.deleteRecord", params)
 
-    def unlikePost(self, uri):
+    def unlikePost(self, uri) -> dict:
+        "Unlike"
         params = {
             "repo": self._data["did"],
             "collection": "app.bsky.feed.like",
@@ -222,7 +257,8 @@ class Session:
         }
         return self.post("com.atproto.repo.deleteRecord", params)
 
-    def listPosts(self, did, limit=None, cursor=None, reverse=None):
+    def listPosts(self, did, limit=None, cursor=None, reverse=None) -> dict:
+        "A list of my posts"
         params = {
             "repo": did,
             "collection": "app.bsky.feed.post",
@@ -235,16 +271,16 @@ class Session:
             params["reverse"] = reverse
         return self.get("com.atproto.repo.listRecords", params)
 
-    def deleteSession(self):
+    def deleteSession(self) -> dict:
         return self.post("com.atproto.server.deleteSession", token="refreshJwt")
 
-    def refreshSession(self):
+    def refreshSession(self) -> dict:
         self._data.update(
             self.post("com.atproto.server.refreshSession", token="refreshJwt")
         )
 
 
-def createSession(identifier, password, authFactorToken=None, prefix="https://bsky.social/xrpc/"):
+def createSession(identifier: str, password: str, authFactorToken=None, prefix="https://bsky.social/xrpc/") -> Session:
     params = {"identifier": identifier, "password": password}
     if authFactorToken:
         params["authFactorToken"] = authFactorToken
@@ -256,7 +292,7 @@ def createSession(identifier, password, authFactorToken=None, prefix="https://bs
     return Session(json_response, prefix)
 
 
-def getSession(accessJwt, refreshJwt, prefix="https://bsky.social/xrpc/"):
+def getSession(accessJwt: str, refreshJwt: str, prefix="https://bsky.social/xrpc/") -> Session:
     json_response = _requests_get(
         prefix + "com.atproto.server.getSession",
         headers = {"Authorization": f"Bearer {accessJwt}"}
