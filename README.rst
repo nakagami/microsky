@@ -9,6 +9,25 @@ Usage
 
 See microsky.py and the Bluesky HTTP API reference https://docs.bsky.app/docs/category/http-reference for usage.
 
+Install
+-----------------
+
+Python
++++++++++++++++
+
+::
+
+   pip install microsky
+
+MicroPython
++++++++++++++++
+
+Go interactive shell and install with mip as follow.
+::
+
+   >>> import mip
+   >>> mip.install("urequests")
+   >>> mip.install("https://github.com/nakagami/microsky/blob/master/microsky.py")
 
 Example
 -----------------
