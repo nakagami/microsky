@@ -23,13 +23,13 @@
 ################################################################################
 import sys
 import json
-import requests
 import time
 
 __version__ = "0.1.1"
 
 
 def _requests_get(url, params=None, headers=None):
+    import requests
     def _urlencode(params):
         converted = []
         for k, s in params.items():
@@ -60,6 +60,7 @@ def _requests_get(url, params=None, headers=None):
 
 
 def _requests_post(url, data=None, headers=None):
+    import requests
     if data:
         response = requests.post(url, data=data, headers=headers)
     else:
