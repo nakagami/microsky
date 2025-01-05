@@ -25,7 +25,7 @@ import sys
 import json
 import time
 
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 
 def _requests_get(url, params=None, headers=None):
